@@ -1,9 +1,11 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import * as authService from '../services/authService';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('crm-token'));
   const [isLoading, setIsLoading] = useState(true);
@@ -29,6 +31,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('crm-token', data.token);
     setToken(data.token);
     setUser(data.user);
+    navigate('/');
   };
 
   const register = async (name, email, password) => {
@@ -36,13 +39,14 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('crm-token', data.token);
     setToken(data.token);
     setUser(data.user);
+    navigate('/');
   };
 
   const logout = () => {
     authService.logout();
     setToken(null);
     setUser(null);
-    window.location.href = '/login';
+    navigate('/login');
   };
 
   return (

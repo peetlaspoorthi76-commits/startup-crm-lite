@@ -1,14 +1,32 @@
+import { LayoutDashboard, LogOut, PieChart, Users, X } from 'lucide-react';
+import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Users, PieChart, X } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 import DarkModeToggle from './DarkModeToggle';
 
 export default function Sidebar({ isOpen, setIsOpen }) {
+  const { logout, user } = useAuth();
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const navLinkClasses = ({ isActive }) =>
     `flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors ${
       isActive
         ? 'bg-primary text-white'
         : 'text-muted hover:bg-surface-hover'
     }`;
+
+  const handleLogoutClick = () => {
+    setShowConfirmDialog(true);
+  };
+
+  const confirmLogout = () => {
+    setShowConfirmDialog(false);
+    setIsOpen(false);
+    logout();
+  };
+
+  const cancelLogout = () => {
+    setShowConfirmDialog(false);
+  };
 
   return (
     <>
@@ -53,11 +71,51 @@ export default function Sidebar({ isOpen, setIsOpen }) {
           </NavLink>
         </nav>
 
-        <div className="mt-auto p-4 border-t border-border flex items-center justify-between bg-surface">
+        <div className="p-4 border-t border-border">
+          {user && (
+            <div className="mb-4">
+              <p className="text-sm font-medium text-foreground">{user.name}</p>
+              <p className="text-xs text-muted">{user.email}</p>
+            </div>
+          )}
+          <button
+            onClick={handleLogoutClick}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors text-muted hover:bg-surface-hover"
+          >
+            <LogOut size={20} />
+            <span>Logout</span>
+          </button>
+        </div>
+
+        <div className="p-4 border-t border-border flex items-center justify-between bg-surface">
           <span className="text-sm font-medium text-muted">Theme</span>
           <DarkModeToggle />
         </div>
       </aside>
+
+      {/* Logout Confirmation Dialog */}
+      {showConfirmDialog && (
+        <div className="fixed inset-0 bg-foreground/50 flex items-center justify-center p-4 z-[60]">
+          <div className="bg-surface rounded-xl border border-border p-6 w-full max-w-sm shadow-lg">
+            <h3 className="text-lg font-bold text-foreground mb-2">Confirm Logout</h3>
+            <p className="text-muted mb-6">Are you sure you want to log out?</p>
+            <div className="flex gap-3">
+              <button
+                onClick={cancelLogout}
+                className="flex-1 py-2 bg-background text-foreground rounded-lg hover:bg-surface-hover transition-colors font-medium border border-border"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmLogout}
+                className="flex-1 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors font-medium"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

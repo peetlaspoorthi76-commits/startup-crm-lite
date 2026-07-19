@@ -6,6 +6,13 @@ import QuickActions from '../components/dashboard/QuickActions';
 import { useLeads } from '../context/LeadContext';
 import { getCoreMetrics, formatCurrency } from '../utils/analyticsHelpers';
 
+const getGreeting = () => {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good morning!';
+  if (hour < 18) return 'Good afternoon!';
+  return 'Good evening!';
+};
+
 export default function Dashboard() {
   const { leads } = useLeads();
   const metrics = getCoreMetrics(leads);
@@ -16,7 +23,7 @@ export default function Dashboard() {
   return (
     <div className="max-w-7xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground">Good evening!</h1>
+        <h1 className="text-3xl font-bold text-foreground">{getGreeting()}</h1>
         <p className="text-muted mt-1">Here is your pipeline overview for today.</p>
       </div>
 
