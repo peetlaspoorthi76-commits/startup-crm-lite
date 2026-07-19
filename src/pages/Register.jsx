@@ -29,35 +29,47 @@ export default function Register() {
     }
   };
 
+  const inputClass =
+    'mt-1 w-full rounded-md border border-border px-3 py-2 bg-surface text-foreground focus:ring-2 focus:ring-primary outline-none';
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
-      <div className="w-full max-w-md space-y-8 bg-white dark:bg-gray-800 p-8 rounded-xl shadow-md border border-gray-200 dark:border-gray-700">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="w-full max-w-md space-y-8 bg-surface p-8 rounded-xl shadow-md border border-border">
         <div>
-          <h2 className="text-center text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Create a new account</h2>
+          <h2 className="text-center text-3xl font-bold tracking-tight text-foreground">
+            Create a new account
+          </h2>
         </div>
         <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Full Name</label>
-            <input type="text" required value={name} onChange={(e) => setName(e.target.value)} className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
+            <label className="block text-sm font-medium text-muted">Full Name</label>
+            <input type="text" required value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email address</label>
-            <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
+            <label className="block text-sm font-medium text-muted">Email address</label>
+            <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
-            <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
+            <label className="block text-sm font-medium text-muted">Password</label>
+            <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirm Password</label>
-            <input type="password" required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
+            <label className="block text-sm font-medium text-muted">Confirm Password</label>
+            <input type="password" required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className={inputClass} />
           </div>
-          <button type="submit" disabled={loading} className="w-full mt-2 rounded-md bg-blue-600 py-2 font-medium text-white hover:bg-blue-700 disabled:opacity-50">
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full mt-2 rounded-md bg-primary py-2 font-medium text-white hover:bg-primary-hover disabled:opacity-50"
+          >
             {loading ? 'Creating account...' : 'Register'}
           </button>
         </form>
-        <p className="text-center text-sm text-gray-600 dark:text-gray-400">
-          Already have an account? <Link to="/login" className="text-blue-600 hover:underline">Log in here</Link>
+        <p className="text-center text-sm text-muted">
+          Already have an account?{' '}
+          <Link to="/login" className="text-primary hover:underline">
+            Log in here
+          </Link>
         </p>
       </div>
     </div>

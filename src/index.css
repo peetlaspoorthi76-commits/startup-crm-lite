@@ -1,1 +1,56 @@
 @import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #F3FAFC;
+  --surface: #E7F4F7;
+  --primary: #007C91;
+  --secondary: #3AA5B8;
+  --accent: #FF8C61;
+  --foreground: #18333D;
+  --border: #C9E1E7;
+  --muted: #5A7A85;
+  --primary-hover: #006878;
+  --surface-hover: #D9ECF1;
+  --chart-grid: #C9E1E7;
+  --chart-tooltip-bg: #E7F4F7;
+  --chart-tooltip-border: #C9E1E7;
+  --chart-tooltip-text: #18333D;
+}
+
+.dark {
+  --background: #081B20;
+  --surface: #102A31;
+  --primary: #57D4E6;
+  --secondary: #83E4F0;
+  --accent: #FFB089;
+  --foreground: #EFFCFF;
+  --border: #234149;
+  --muted: #8BAEB8;
+  --primary-hover: #83E4F0;
+  --surface-hover: #1A3840;
+  --chart-grid: #234149;
+  --chart-tooltip-bg: #102A31;
+  --chart-tooltip-border: #234149;
+  --chart-tooltip-text: #EFFCFF;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-foreground: var(--foreground);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+  --color-primary-hover: var(--primary-hover);
+  --color-surface-hover: var(--surface-hover);
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}

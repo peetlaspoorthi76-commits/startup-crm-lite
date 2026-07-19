@@ -24,29 +24,41 @@ export default function Login() {
     }
   };
 
+  const inputClass =
+    'mt-1 w-full rounded-md border border-border px-3 py-2 bg-surface text-foreground focus:ring-2 focus:ring-primary outline-none';
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
-      <div className="w-full max-w-md space-y-8 bg-white dark:bg-gray-800 p-8 rounded-xl shadow-md border border-gray-200 dark:border-gray-700">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="w-full max-w-md space-y-8 bg-surface p-8 rounded-xl shadow-md border border-border">
         <div>
-          <h2 className="text-center text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Sign in to your account</h2>
+          <h2 className="text-center text-3xl font-bold tracking-tight text-foreground">
+            Sign in to your account
+          </h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4 rounded-md shadow-sm">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email address</label>
-              <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
+              <label className="block text-sm font-medium text-muted">Email address</label>
+              <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
-              <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
+              <label className="block text-sm font-medium text-muted">Password</label>
+              <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
             </div>
           </div>
-          <button type="submit" disabled={loading} className="w-full rounded-md bg-blue-600 py-2 font-medium text-white hover:bg-blue-700 disabled:opacity-50">
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-md bg-primary py-2 font-medium text-white hover:bg-primary-hover disabled:opacity-50"
+          >
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
-        <p className="text-center text-sm text-gray-600 dark:text-gray-400">
-          Don't have an account? <Link to="/register" className="text-blue-600 hover:underline">Register here</Link>
+        <p className="text-center text-sm text-muted">
+          Don't have an account?{' '}
+          <Link to="/register" className="text-primary hover:underline">
+            Register here
+          </Link>
         </p>
       </div>
     </div>

@@ -76,3 +76,4 @@ export const LeadProvider = ({ children }) => {
 };
 
 export const useLeads = () => useContext(LeadContext);
+export const useLeadContext = useLeads;

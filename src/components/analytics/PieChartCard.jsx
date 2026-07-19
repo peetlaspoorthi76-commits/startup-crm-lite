@@ -1,16 +1,28 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
-export default function PieChartCard({ data, total }) {
+export default function PieChartCard({ data = [], total = 0 }) {
+  const safeData = Array.isArray(data) ? data : [];
+  const safeTotal = Number.isFinite(total) ? total : 0;
+
+  if (safeData.length === 0) {
+    return (
+      <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm flex flex-col h-[400px] items-center justify-center">
+        <h3 className="text-lg font-bold text-foreground mb-1">Lead Status Distribution</h3>
+        <p className="text-sm text-muted">No leads available to display status breakdown.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-[#1E293B] p-6 rounded-2xl border border-slate-700 shadow-sm flex flex-col h-[400px]">
-      <h3 className="text-lg font-bold text-white mb-1">Lead Status Distribution</h3>
-      <p className="text-xs text-slate-400 mb-4">Proportional breakdown of opportunities.</p>
+    <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm flex flex-col h-[400px]">
+      <h3 className="text-lg font-bold text-foreground mb-1">Lead Status Distribution</h3>
+      <p className="text-xs text-muted mb-4">Proportional breakdown of opportunities.</p>
 
       <div className="flex-1 relative">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
-              data={data}
+              data={safeData}
               cx="50%"
               cy="50%"
               innerRadius={70}
@@ -19,21 +31,30 @@ export default function PieChartCard({ data, total }) {
               dataKey="value"
               stroke="none"
             >
-              {data.map((entry, index) => (
+              {safeData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.fill} />
               ))}
             </Pie>
             <Tooltip
-              contentStyle={{ backgroundColor: '#0F172A', border: '1px solid #334155', borderRadius: '8px', color: '#fff' }}
-              itemStyle={{ color: '#fff' }}
+              contentStyle={{
+                backgroundColor: 'var(--chart-tooltip-bg)',
+                border: '1px solid var(--chart-tooltip-border)',
+                borderRadius: '8px',
+                color: 'var(--chart-tooltip-text)',
+              }}
+              itemStyle={{ color: 'var(--chart-tooltip-text)' }}
             />
-            <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '12px', color: '#94A3B8' }} />
+            <Legend
+              verticalAlign="bottom"
+              height={36}
+              iconType="circle"
+              wrapperStyle={{ fontSize: '12px', color: 'var(--muted)' }}
+            />
           </PieChart>
         </ResponsiveContainer>
-        {/* Center Text overlay */}
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pb-8">
-          <span className="text-3xl font-bold text-white">{total}</span>
-          <span className="text-[10px] uppercase tracking-wider text-slate-400">Total Leads</span>
+          <span className="text-3xl font-bold text-foreground">{safeTotal}</span>
+          <span className="text-[10px] uppercase tracking-wider text-muted">Total Leads</span>
         </div>
       </div>
     </div>

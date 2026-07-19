@@ -1,19 +1,16 @@
 export default function StatusBadge({ status }) {
-const colors = {
-'New': 'bg-slate-100 text-slate-700',
-'Contacted': 'bg-blue-100 text-blue-700',
-'Meeting Scheduled': 'bg-yellow-100 text-yellow-700',
-'Proposal Sent': 'bg-purple-100 text-purple-700',
-'Won': 'bg-green-100 text-green-700',
-'Lost': 'bg-red-100 text-red-700'
-};
+  const colors = {
+    New: 'bg-background text-foreground border border-border',
+    Contacted: 'bg-primary/15 text-primary',
+    'Meeting Scheduled': 'bg-secondary/15 text-secondary',
+    'Proposal Sent': 'bg-accent/15 text-accent',
+    Won: 'bg-primary/20 text-primary',
+    Lost: 'bg-accent/20 text-accent',
+  };
 
-// Fallback to New/gray if status is unknown
-const colorClass = colors[status] || colors['New'];
+  const colorClass = colors[status] || colors.New;
 
-return (
-<span className={`px-3 py-1 rounded-full text-xs font-medium ${colorClass}`}>
-    {status}
-</span>
-);
+  return (
+    <span className={`px-3 py-1 rounded-full text-xs font-medium ${colorClass}`}>{status}</span>
+  );
 }
