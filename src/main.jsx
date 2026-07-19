@@ -1,16 +1,18 @@
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import App from './App.jsx';
-import './index.css';
-import { LeadProvider } from './context/LeadContext';
-import { ThemeProvider } from './context/ThemeContext';
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.jsx'
+import './index.css'
+// 1. Import your providers
+import { AuthProvider } from './context/AuthContext'
+import { LeadProvider } from './context/LeadContext'
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <LeadProvider>
-      <ThemeProvider>
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    {/* 2. Wrap your App with the Providers */}
+    <AuthProvider>
+      <LeadProvider>
         <App />
-      </ThemeProvider>
-    </LeadProvider>
-  </StrictMode>
-);
+      </LeadProvider>
+    </AuthProvider>
+  </React.StrictMode>
+)
