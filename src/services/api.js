@@ -1,20 +1,20 @@
 import axios from 'axios';
 
-const api = axios.create({ baseURL: import.meta.env.VITE_API_URL });
-
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('crm-token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
+// Hardcoding the base URL ensures Vercel never tries to process backend requests locally
+const api = axios.create({
+  baseURL: 'https://backend-production-4cb0d.up.railway.app'
 });
 
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('crm-token');
-      window.location.href = '/login';
+// Automatically attach JWT tokens to every outgoing request
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('crm-token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
+    return config;
+  },
+  (error) => {
     return Promise.reject(error);
   }
 );
