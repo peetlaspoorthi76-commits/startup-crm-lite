@@ -1,134 +1,153 @@
-import { useMemo, useState } from 'react';
-import { useLeads } from '../context/LeadContext';
+import React, { useMemo } from 'react';
+import { useLeadContext } from '../context/LeadContext'; // Make sure this matches your hook name (could be useLeads)
 import {
-  getPipelineValue, getWonRevenue, getAverageSalesCycle,
-  getStatusDistribution, getFunnelData, getLeadSourceStats,
-  getTopPerformers, getMonthlyLeads, getConversionByMonth,
-  getRevenueGrowth, getActivityHeatmapData
-} from '../utils/analyticsHelpers';
-import { Users, Target, DollarSign, TrendingUp, Clock, Zap, BarChart3 } from 'lucide-react';
-
-import FunnelChartCard from '../components/analytics/FunnelChartCard';
-import PieChartCard from '../components/analytics/PieChartCard';
-import LeadSourceChart from '../components/analytics/LeadSourceChart';
-import TopPerformersCard from '../components/analytics/TopPerformersCard';
-import BarChartCard from '../components/analytics/BarChartCard';
-import LineChartCard from '../components/analytics/LineChartCard';
-import RevenueGrowthChart from '../components/analytics/RevenueGrowthChart';
-import ActivityHeatmap from '../components/analytics/ActivityHeatmap';
-import ForecastCard from '../components/analytics/ForecastCard';
-import SalesVelocityCard from '../components/analytics/SalesVelocityCard';
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  LineChart, Line, PieChart, Pie, Cell
+} from 'recharts';
+import { Users, TrendingUp, DollarSign, Activity } from 'lucide-react';
 
 export default function Analytics() {
-  const { leads } = useLeads();
-  const [filter, setFilter] = useState('All Time');
+  // Pull real live data from your database context
+  const { leads } = useLeadContext();
 
-  const analyticsData = useMemo(() => {
+  // Dynamically calculate top metrics
+  const metrics = useMemo(() => {
     const totalLeads = leads.length;
-    const wonLeads = leads.filter(l => l.status === 'Won').length;
-    const lostLeads = leads.filter(l => l.status === 'Lost').length;
+    const wonLeads = leads.filter(lead => lead.status === 'Won');
+    const lostLeads = leads.filter(lead => lead.status === 'Lost');
+    const activeLeads = leads.filter(lead => lead.status !== 'Won' && lead.status !== 'Lost');
 
-    return {
-      total: totalLeads,
-      winRate: totalLeads > 0 ? Math.round((wonLeads / totalLeads) * 100) : 0,
-      lostRate: totalLeads > 0 ? Math.round((lostLeads / totalLeads) * 100) : 0,
-      pipelineValue: getPipelineValue(leads),
-      wonRevenue: getWonRevenue(leads),
-      avgCycle: getAverageSalesCycle(),
-      statusDist: getStatusDistribution(leads),
-      funnel: getFunnelData(leads),
-      sources: getLeadSourceStats(leads),
-      performers: getTopPerformers(leads),
-      monthlyLeads: getMonthlyLeads(leads),
-      conversionTrend: getConversionByMonth(),
-      revenueTrend: getRevenueGrowth(),
-      heatmap: getActivityHeatmapData()
-    };
+    const conversionRate = totalLeads > 0
+      ? Math.round((wonLeads.length / totalLeads) * 100)
+      : 0;
+
+    const pipelineValue = activeLeads.reduce((sum, lead) => sum + (Number(lead.value) || 0), 0);
+    const wonRevenue = wonLeads.reduce((sum, lead) => sum + (Number(lead.value) || 0), 0);
+
+    return { totalLeads, conversionRate, pipelineValue, wonRevenue };
   }, [leads]);
 
-  if (!leads || leads.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-        <div className="p-4 bg-slate-800 rounded-full mb-4">
-          <BarChart3 size={48} className="text-slate-400" />
-        </div>
-        <h2 className="text-2xl font-bold text-white mb-2">No analytics available yet</h2>
-        <p className="text-slate-400 mb-6 max-w-sm">Add your first lead to start tracking business performance.</p>
-      </div>
-    );
-  }
+  // Dynamically calculate Funnel Data
+  const funnelData = useMemo(() => {
+    const counts = { 'New': 0, 'Contacted': 0, 'Proposal': 0, 'Won': 0 };
+    leads.forEach(lead => {
+      if (counts[lead.status] !== undefined) {
+        counts[lead.status]++;
+      }
+    });
+    return Object.keys(counts).map(key => ({
+      name: key,
+      value: counts[key]
+    }));
+  }, [leads]);
+
+  // Dynamically calculate Source Data
+  const sourceData = useMemo(() => {
+    const sources = {};
+    leads.forEach(lead => {
+      const source = lead.source || 'Other';
+      sources[source] = (sources[source] || 0) + 1;
+    });
+    return Object.keys(sources).map(key => ({
+      name: key,
+      value: sources[key]
+    }));
+  }, [leads]);
+
+  const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
   return (
-    <div className="max-w-7xl mx-auto pb-12 animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-white">Analytics Dashboard</h1>
-          <p className="text-slate-400 mt-1">Track sales performance and growth trends.</p>
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Analytics Dashboard</h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400">Track your real sales performance and growth trends.</p>
+      </div>
+
+      {/* Top Metrics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white dark:bg-[#1E293B] p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Total Leads</span>
+            <Users size={16} className="text-blue-500" />
+          </div>
+          <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{metrics.totalLeads}</h3>
         </div>
-        <div className="flex gap-2 bg-[#1E293B] p-1 rounded-lg border border-slate-700">
-            {['Last 7 Days', 'Last 30 Days', 'Last 90 Days', 'This Year', 'All Time'].map(f => (
-                <button
-                    key={f}
-                    onClick={() => setFilter(f)}
-                    className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${filter === f ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'}`}
-                >
-                    {f}
-                </button>
-            ))}
+
+        <div className="bg-white dark:bg-[#1E293B] p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Conversion Rate</span>
+            <TrendingUp size={16} className="text-green-500" />
+          </div>
+          <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{metrics.conversionRate}%</h3>
+        </div>
+
+        <div className="bg-white dark:bg-[#1E293B] p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Pipeline Value</span>
+            <DollarSign size={16} className="text-yellow-500" />
+          </div>
+          <h3 className="text-2xl font-bold text-slate-900 dark:text-white">₹{metrics.pipelineValue.toLocaleString()}</h3>
+        </div>
+
+        <div className="bg-white dark:bg-[#1E293B] p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Won Revenue</span>
+            <Activity size={16} className="text-purple-500" />
+          </div>
+          <h3 className="text-2xl font-bold text-slate-900 dark:text-white">₹{metrics.wonRevenue.toLocaleString()}</h3>
         </div>
       </div>
 
-      {/* Row 1: Top KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
-        <StatCard title="TOTAL LEADS" value={analyticsData.total} icon={Users} color="text-blue-500" />
-        <StatCard title="CONVERSION RATE" value={`${analyticsData.winRate}%`} icon={Target} color="text-green-500" />
-        <StatCard title="PIPELINE VALUE" value={`₹${analyticsData.pipelineValue.toLocaleString()}`} icon={DollarSign} color="text-yellow-500" />
-        <StatCard title="WON REVENUE" value={`₹${analyticsData.wonRevenue.toLocaleString()}`} icon={TrendingUp} color="text-emerald-500" />
-        <StatCard title="AVG SALES CYCLE" value={`${analyticsData.avgCycle} Days`} icon={Clock} color="text-purple-500" />
-        <StatCard title="LOST RATE" value={`${analyticsData.lostRate}%`} icon={Zap} color="text-red-500" />
-      </div>
-
-      {/* Row 2: Distribution & Funnel */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <PieChartCard data={analyticsData.statusDist} total={analyticsData.total} />
-        <FunnelChartCard data={analyticsData.funnel} />
-      </div>
-
-      {/* Row 3: Monthly & Conversion Trends */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <BarChartCard data={analyticsData.monthlyLeads} />
-        <LineChartCard data={analyticsData.conversionTrend} />
-      </div>
-
-      {/* Row 4: Revenue & Sources */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <RevenueGrowthChart data={analyticsData.revenueTrend} />
-        <LeadSourceChart data={analyticsData.sources} />
-      </div>
-
-      {/* Row 5: Heatmap & Top Performers */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <ActivityHeatmap data={analyticsData.heatmap} />
-        <TopPerformersCard data={analyticsData.performers} />
-      </div>
-
-      {/* Row 6: Forecast & Velocity */}
+      {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ForecastCard />
-        <SalesVelocityCard />
-      </div>
-    </div>
-  );
-}
 
-function StatCard({ title, value, icon: Icon, color }) {
-  return (
-    <div className="bg-[#1E293B] p-5 rounded-2xl border border-slate-700 shadow-sm flex flex-col justify-between">
-      <div className="flex justify-between items-start mb-2">
-        <h4 className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">{title}</h4>
-        <Icon size={16} className={color} />
+        {/* Sales Pipeline Funnel */}
+        <div className="bg-white dark:bg-[#1E293B] p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Sales Pipeline</h3>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={funnelData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#334155" horizontal={false} />
+                <XAxis type="number" stroke="#94a3b8" />
+                <YAxis dataKey="name" type="category" stroke="#94a3b8" width={80} />
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', color: '#f8fafc' }}
+                  itemStyle={{ color: '#3b82f6' }}
+                />
+                <Bar dataKey="value" fill="#3b82f6" radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Lead Sources Pie Chart */}
+        <div className="bg-white dark:bg-[#1E293B] p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Lead Sources</h3>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={sourceData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={80}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {sourceData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', color: '#f8fafc' }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
       </div>
-      <p className="text-2xl font-bold text-white mt-2">{value}</p>
     </div>
   );
 }
